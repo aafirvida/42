@@ -75,6 +75,8 @@ struct PowerSupplyPaths {
     char* batteryHealthPath;
     char* batteryPresentPath;
     char* batteryCapacityPath;
+    char* batteryChargeNowPath;
+    char* batteryChargeFullPath;
     char* batteryVoltagePath;
     char* batteryTemperaturePath;
     char* batteryTechnologyPath;
@@ -193,14 +195,43 @@ static void setVoltageField(JNIEnv* env, jobject obj, const char* path, jfieldID
     env->SetIntField(obj, fieldID, value);
 }
 
+static void setChargeLevel(JNIEnv* env, jobject obj, jfieldID fieldID) {
+    float now,full;
+    int value = 0;
+    char buf[128];
+
+    if (readFromFile(gPaths.batteryChargeNowPath, buf, 128) > 0 ) {
+        now = atoi(buf);
+        if (readFromFile(gPaths.batteryChargeFullPath, buf, 128) > 0 ) {
+            full = atoi(buf);
+            value = (int)((now/full) * 100);
+        } else {
+            value = now;
+        }
+    }
+    env->SetIntField(obj, fieldID, value);
+}
 
 static void android_server_BatteryService_update(JNIEnv* env, jobject obj)
 {
     setBooleanField(env, obj, gPaths.acOnlinePath, gFieldIds.mAcOnline);
     setBooleanField(env, obj, gPaths.usbOnlinePath, gFieldIds.mUsbOnline);
     setBooleanField(env, obj, gPaths.batteryPresentPath, gFieldIds.mBatteryPresent);
+    if ( !gPaths.acOnlinePath && !gPaths.usbOnlinePath && !gPaths.batteryPresentPath) {
+        /* most likely, we have a PC here */
+        env->SetBooleanField(obj, gFieldIds.mAcOnline, true);
+    }
     
-    setIntField(env, obj, gPaths.batteryCapacityPath, gFieldIds.mBatteryLevel);
+    if (gPaths.batteryPresentPath) {
+        if (gPaths.batteryCapacityPath) {
+            setIntField(env, obj, gPaths.batteryCapacityPath, gFieldIds.mBatteryLevel);
+        } else {
+            setChargeLevel(env,obj, gFieldIds.mBatteryLevel);
+        }
+    } else {
+        /*This is a PC or VM, faking the level to full, we are on AC anyway */
+        env->SetIntField(obj, gFieldIds.mBatteryLevel, 100);
+    }
     setVoltageField(env, obj, gPaths.batteryVoltagePath, gFieldIds.mBatteryVoltage);
     setIntField(env, obj, gPaths.batteryTemperaturePath, gFieldIds.mBatteryTemperature);
     
@@ -272,8 +303,31 @@ int register_android_server_BatteryService(JNIEnv* env)
                 if (access(path, R_OK) == 0)
                     gPaths.batteryPresentPath = strdup(path);
                 snprintf(path, sizeof(path), "%s/%s/capacity", POWER_SUPPLY_PATH, name);
-                if (access(path, R_OK) == 0)
+                if (access(path, R_OK) == 0) {
                     gPaths.batteryCapacityPath = strdup(path);
+                } else {
+                    snprintf(path, sizeof(path), "%s/%s/charge_now",
+                            POWER_SUPPLY_PATH, name);
+                    if (access(path, R_OK) == 0) {
+                        gPaths.batteryChargeNowPath = strdup(path);
+                        snprintf(path, sizeof(path), "%s/%s/charge_full",
+                                POWER_SUPPLY_PATH, name);
+                        if (access(path, R_OK) == 0) {
+                            gPaths.batteryChargeFullPath = strdup(path);
+                        }
+                    } else {
+                        snprintf(path, sizeof(path), "%s/%s/energy_now",
+                                POWER_SUPPLY_PATH, name);
+                        if (access(path, R_OK) == 0) {
+                            gPaths.batteryChargeNowPath = strdup(path);
+                            snprintf(path, sizeof(path), "%s/%s/energy_full",
+                                    POWER_SUPPLY_PATH, name);
+                            if (access(path, R_OK) == 0) {
+                                gPaths.batteryChargeFullPath = strdup(path);
+                            }
+                        }
+                    }
+                }
 
                 snprintf(path, sizeof(path), "%s/%s/voltage_now", POWER_SUPPLY_PATH, name);
                 if (access(path, R_OK) == 0) {
@@ -313,7 +367,8 @@ int register_android_server_BatteryService(JNIEnv* env)
         LOGE("batteryHealthPath not found");
     if (!gPaths.batteryPresentPath)
         LOGE("batteryPresentPath not found");
-    if (!gPaths.batteryCapacityPath)
+    if (!gPaths.batteryCapacityPath && (!gPaths.batteryChargeNowPath ||
+                                        !gPaths.batteryChargeFullPath))
         LOGE("batteryCapacityPath not found");
     if (!gPaths.batteryVoltagePath)
         LOGE("batteryVoltagePath not found");
