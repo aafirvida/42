@@ -483,7 +483,9 @@ class BatteryService extends Binder {
                 return com.android.internal.R.drawable.stat_sys_battery;
             }
         } else {
-            return mBatteryPresent ?
+            return (mPlugType != BATTERY_PLUGGED_NONE) ?
+                    com.android.internal.R.drawable.stat_sys_battery_charge :
+                    mBatteryPresent ?
                     com.android.internal.R.drawable.stat_sys_battery_unknown :
                     com.android.internal.R.drawable.gpm_ac_adapter;
         }
