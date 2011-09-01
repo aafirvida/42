@@ -31,6 +31,7 @@ import android.net.NetworkUtils;
 import android.os.Message;
 import android.os.PowerManager;
 import android.os.SystemClock;
+import android.os.SystemProperties;
 import android.util.Log;
 
 /**
@@ -112,7 +113,7 @@ public class DhcpStateMachine extends StateMachine {
 
         mContext = context;
         mController = controller;
-        mInterfaceName = intf;
+        mInterfaceName = intf.isEmpty() ? SystemProperties.get("wlan.interface", "wlan0") : intf;
 
         mAlarmManager = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
         Intent dhcpRenewalIntent = new Intent(ACTION_DHCP_RENEW, null);

@@ -360,7 +360,7 @@ public class WifiService extends IWifiManager.Stub {
     WifiService(Context context) {
         mContext = context;
 
-        mInterfaceName =  SystemProperties.get("wifi.interface", "wlan0");
+        mInterfaceName = SystemProperties.get("wifi.interface", "");
 
         mWifiStateMachine = new WifiStateMachine(mContext, mInterfaceName);
         mWifiStateMachine.enableRssiPolling(true);
