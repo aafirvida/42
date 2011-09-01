@@ -276,7 +276,7 @@ public final class WifiService extends IWifiManager.Stub {
     public WifiService(Context context) {
         mContext = context;
 
-        mInterfaceName =  SystemProperties.get("wifi.interface", "wlan0");
+        mInterfaceName = SystemProperties.get("wlan.interface", "wlan0");
 
         mWifiStateMachine = new WifiStateMachine(mContext, mInterfaceName);
         mWifiStateMachine.enableRssiPolling(true);
