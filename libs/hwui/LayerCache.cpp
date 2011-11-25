@@ -23,6 +23,7 @@
 #include "Debug.h"
 #include "LayerCache.h"
 #include "Properties.h"
+#include "Caches.h"
 
 namespace android {
 namespace uirenderer {
@@ -70,7 +71,8 @@ void LayerCache::deleteLayer(Layer* layer) {
     if (layer) {
         LAYER_LOGD("Destroying layer %dx%d", layer->getWidth(), layer->getHeight());
         mSize -= layer->getWidth() * layer->getHeight() * 4;
-        layer->deleteFbo();
+        if (layer->getFbo())
+            Caches::getInstance().fboCache.put(layer->getFbo());
         layer->deleteTexture();
         delete layer;
     }
