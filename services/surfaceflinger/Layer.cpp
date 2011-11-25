@@ -408,6 +408,11 @@ void Layer::lockPageFlip(bool& recomputeVisibleRegions)
 
         // update the active buffer
         mActiveBuffer = mSurfaceTexture->getCurrentBuffer();
+        if (mActiveBuffer == NULL) {
+            // FIXME this happnes, but how?
+            LOGE("no current buffer");
+            return;
+        }
 
         const Rect crop(mSurfaceTexture->getCurrentCrop());
         const uint32_t transform(mSurfaceTexture->getCurrentTransform());
