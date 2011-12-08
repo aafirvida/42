@@ -213,9 +213,14 @@ public class ActivityManager {
      * Used by persistent processes to determine if they are running on a
      * higher-end device so should be okay using hardware drawing acceleration
      * (which tends to consume a lot more RAM).
+     * Alternatively, setting debug.egl.hw=0 disables hardware acceleration.
      * @hide
      */
     static public boolean isHighEndGfx(Display display) {
+        if (SystemProperties.get("debug.egl.hw").equals("0")) {
+            return false;
+        }
+
         MemInfoReader reader = new MemInfoReader();
         reader.readMemInfo();
         if (reader.getTotalSize() >= (512*1024*1024)) {
