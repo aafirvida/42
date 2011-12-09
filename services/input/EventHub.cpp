@@ -932,9 +932,6 @@ status_t EventHub::openDeviceLocked(const char *devicePath) {
         driverVersion >> 16, (driverVersion >> 8) & 0xff, driverVersion & 0xff);
 #endif
 
-    // Load the configuration file for the device.
-    loadConfigurationLocked(device);
-
     // Figure out the kinds of events the device reports.
     ioctl(fd, EVIOCGBIT(EV_KEY, sizeof(device->keyBitmask)), device->keyBitmask);
     ioctl(fd, EVIOCGBIT(EV_ABS, sizeof(device->absBitmask)), device->absBitmask);
@@ -1001,6 +998,9 @@ status_t EventHub::openDeviceLocked(const char *devicePath) {
             break;
         }
     }
+
+    // Load the configuration file for the device.
+    loadConfigurationLocked(device);
 
     // Configure virtual keys.
     if ((device->classes & INPUT_DEVICE_CLASS_TOUCH)) {
@@ -1096,6 +1096,10 @@ status_t EventHub::openDeviceLocked(const char *devicePath) {
 void EventHub::loadConfigurationLocked(Device* device) {
     device->configurationFile = getInputDeviceConfigurationFilePathByDeviceIdentifier(
             device->identifier, INPUT_DEVICE_CONFIGURATION_FILE_TYPE_CONFIGURATION);
+    if ((device->classes & INPUT_DEVICE_CLASS_TOUCH) && device->configurationFile.isEmpty()) {
+        device->configurationFile = getInputDeviceConfigurationFilePathByName(String8("GenericTouch"),
+                INPUT_DEVICE_CONFIGURATION_FILE_TYPE_CONFIGURATION);
+    }
     if (device->configurationFile.isEmpty()) {
         LOGD("No input device configuration file found for device '%s'.",
                 device->identifier.name.string());
