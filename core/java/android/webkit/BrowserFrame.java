@@ -869,6 +869,11 @@ class BrowserFrame extends Handler {
         loader.setCacheMode(headers.containsKey("If-Modified-Since")
                 || headers.containsKey("If-None-Match") ? 
                         WebSettings.LOAD_NO_CACHE : cacheMode);
+	// Load the page
+        if (!loader.executeLoad()) {
+            Log.e(LOGTAG, "startLoadingResource fail");
+        }
+
         // Set referrer to current URL?
         return !synchronous ? loadListener : null;
     }
