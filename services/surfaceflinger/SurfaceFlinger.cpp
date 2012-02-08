@@ -468,6 +468,16 @@ void SurfaceFlinger::handleConsoleEvents()
 {
     // something to do with the console
     const DisplayHardware& hw = graphicPlane(0).displayHardware();
+    hw_module_t const* mod;
+    gralloc_module_t const* gr = NULL;
+    status_t err;
+
+    err = hw_get_module(GRALLOC_HARDWARE_MODULE_ID, &mod);
+    if (!err) {
+        gr = reinterpret_cast<gralloc_module_t const*>(mod);
+        if (!gr->perform)
+            gr = NULL;
+    }
 
     int what = android_atomic_and(0, &mConsoleSignals);
     if (what & eConsoleAcquired) {
@@ -475,10 +485,14 @@ void SurfaceFlinger::handleConsoleEvents()
         // this is a temporary work-around, eventually this should be called
         // by the power-manager
         SurfaceFlinger::turnElectronBeamOn(mElectronBeamAnimationMode);
+        if (gr)
+            gr->perform(gr, GRALLOC_MODULE_PERFORM_ENTER_VT);
     }
 
     if (what & eConsoleReleased) {
         if (hw.isScreenAcquired()) {
+            if (gr)
+                gr->perform(gr, GRALLOC_MODULE_PERFORM_LEAVE_VT);
             hw.releaseScreen();
         }
     }
