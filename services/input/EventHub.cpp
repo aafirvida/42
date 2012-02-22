@@ -48,6 +48,7 @@
 #include <sys/epoll.h>
 #include <sys/ioctl.h>
 #include <sys/limits.h>
+#include <linux/vt.h>
 
 /* this macro is used to tell if "bit" is set in "array"
  * it selects a byte from the array, and does a boolean AND
@@ -64,6 +65,8 @@
 #define INDENT3 "      "
 
 namespace android {
+
+int android_vt = 1;
 
 static const char *WAKE_LOCK_ID = "KeyEvents";
 static const char *DEVICE_PATH = "/dev/input";
@@ -606,6 +609,14 @@ size_t EventHub::getEvents(int timeoutMillis, RawEvent* buffer, size_t bufferSiz
             }
         }
 
+#ifdef __i386__
+        struct vt_stat vs;
+        int fd_vt = open("/dev/tty0", O_RDWR | O_SYNC);
+        if (fd_vt >= 0) {
+            ioctl(fd_vt, VT_GETSTATE, &vs);
+            close(fd_vt);
+        }
+#endif
         // Grab the next input event.
         bool deviceChanged = false;
         while (mPendingEventIndex < mPendingEventCount) {
@@ -659,6 +670,12 @@ size_t EventHub::getEvents(int timeoutMillis, RawEvent* buffer, size_t bufferSiz
                 } else if ((readSize % sizeof(struct input_event)) != 0) {
                     LOGE("could not get event (wrong size: %d)", readSize);
                 } else {
+#ifdef __i386__
+                    if (vs.v_active != android_vt) {
+                        LOGV("Skip a non Android VT event");
+                        continue;
+                    }
+#endif
                     int32_t deviceId = device->id == mBuiltInKeyboardId ? 0 : device->id;
 
                     size_t count = size_t(readSize) / sizeof(struct input_event);

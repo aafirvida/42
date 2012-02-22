@@ -47,6 +47,8 @@ public:
     }
 };
 
+extern int android_vt;
+
 } // namespace android
 
 
@@ -68,6 +70,7 @@ extern "C" status_t system_init()
     if (strcmp(propBuf, "1") == 0) {
         // Start the SurfaceFlinger
         SurfaceFlinger::instantiate();
+        android_vt = 7;
     }
 
     property_get("system_init.startsensorservice", propBuf, "1");
