@@ -75,8 +75,6 @@ LOCAL_SRC_FILES:= \
 	android_net_TrafficStats.cpp \
 	android_net_wifi_Wifi.cpp \
 	android_nio_utils.cpp \
-	android_nfc_NdefMessage.cpp \
-	android_nfc_NdefRecord.cpp \
 	android_text_format_Time.cpp \
 	android_util_AssetManager.cpp \
 	android_util_Binder.cpp \
@@ -157,6 +155,12 @@ LOCAL_SRC_FILES:= \
 	android_content_res_Configuration.cpp \
     android_animation_PropertyValuesHolder.cpp
 
+ifeq ($(TARGET_ARCH), arm)
+LOCAL_SRC_FILES += \
+	android_nfc_NdefMessage.cpp \
+	android_nfc_NdefRecord.cpp
+endif
+
 LOCAL_C_INCLUDES += \
 	$(JNI_H_INCLUDE) \
 	$(LOCAL_PATH)/android/graphics \
@@ -213,10 +217,14 @@ LOCAL_SHARED_LIBRARIES := \
 	libmedia \
 	libwpa_client \
 	libjpeg \
-	libnfc_ndef \
 	libusbhost \
 	libharfbuzz \
 	libz \
+
+ifeq ($(TARGET_ARCH), arm)
+LOCAL_SHARED_LIBRARIES += \
+	libnfc_ndef
+endif
 
 ifeq ($(USE_OPENGL_RENDERER),true)
 	LOCAL_SHARED_LIBRARIES += libhwui

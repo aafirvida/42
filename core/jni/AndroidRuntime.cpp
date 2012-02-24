@@ -1159,8 +1159,10 @@ static const RegJNIRec gRegJNI[] = {
     REG_JNI(register_android_net_NetworkUtils),
     REG_JNI(register_android_net_TrafficStats),
     REG_JNI(register_android_net_wifi_WifiManager),
+#ifndef __i386__
     REG_JNI(register_android_nfc_NdefMessage),
     REG_JNI(register_android_nfc_NdefRecord),
+#endif
     REG_JNI(register_android_os_MemoryFile),
     REG_JNI(register_com_android_internal_os_ZygoteInit),
     REG_JNI(register_android_hardware_Camera),
