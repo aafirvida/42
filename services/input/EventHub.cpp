@@ -1134,7 +1134,7 @@ status_t EventHub::openDeviceLocked(const char *devicePath) {
             device->classes |= INPUT_DEVICE_CLASS_TOUCH | INPUT_DEVICE_CLASS_TOUCH_MT;
         }
     // Is this an old style single-touch driver?
-    } else if (test_bit(BTN_TOUCH, device->keyBitmask)
+    } else if ((test_bit(BTN_TOUCH, device->keyBitmask) || test_bit(BTN_LEFT, device->keyBitmask))
             && test_bit(ABS_X, device->absBitmask)
             && test_bit(ABS_Y, device->absBitmask)) {
         device->classes |= INPUT_DEVICE_CLASS_TOUCH;
