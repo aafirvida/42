@@ -144,8 +144,18 @@ class BatteryService extends Binder {
             mInvalidChargerObserver.startObserving("DEVPATH=/devices/virtual/switch/invalid_charger");
         }
 
-        // set initial status
-        update();
+        // start polling
+        new Thread(new Runnable() {
+            public void run() {
+                while (true) {
+                    update();
+                    try {
+                        Thread.sleep(30);
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }
+        }, "BatteryServiceUpdateThread").start();
     }
 
     final boolean isPowered() {
