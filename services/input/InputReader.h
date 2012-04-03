@@ -1243,6 +1243,7 @@ protected:
             PRESSURE_CALIBRATION_NONE,
             PRESSURE_CALIBRATION_PHYSICAL,
             PRESSURE_CALIBRATION_AMPLITUDE,
+            PRESSURE_CALIBRATION_DISABLE,
         };
 
         PressureCalibration pressureCalibration;
