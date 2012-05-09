@@ -116,6 +116,13 @@ void SoftMPEG4::initPorts() {
             ? const_cast<char *>(MEDIA_MIMETYPE_VIDEO_MPEG4)
             : const_cast<char *>(MEDIA_MIMETYPE_VIDEO_H263);
 
+    if (mMode == MODE_H263) {
+        // H.263 requires the max size supported by the decoder
+        // which is 16CIF (1408x1152)
+        mWidth=1408;
+        mHeight=1152;
+    }
+
     def.format.video.pNativeRender = NULL;
     def.format.video.nFrameWidth = mWidth;
     def.format.video.nFrameHeight = mHeight;
