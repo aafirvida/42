@@ -537,6 +537,23 @@ EventHub::Device* EventHub::getDeviceByPathLocked(const char* devicePath) const 
     return NULL;
 }
 
+void EventHub::reloadKeyboardLayout() {
+    LOGI("reloadKeyboardLayout");
+
+    for (size_t i = 0; i < mDevices.size(); i++) {
+        Device* device = mDevices.valueAt(i);
+        LOGI("Testing device: id=%d, classes=0x%x, name='%s'",
+                i, device->classes, device->identifier.name.string());
+        if (device->classes & INPUT_DEVICE_CLASS_KEYBOARD) {
+            // reset keyLayout and keyCharacterMap
+            device->keyMap.keyLayoutFile = String8("");
+            device->keyMap.keyCharacterMapFile = String8("");
+            status_t s = loadKeyMapLocked(device);
+            LOGI("loadKeyMapLocked result: %d", s);
+        }
+    }
+}
+
 size_t EventHub::getEvents(int timeoutMillis, RawEvent* buffer, size_t bufferSize) {
     LOG_ASSERT(bufferSize >= 1);
 

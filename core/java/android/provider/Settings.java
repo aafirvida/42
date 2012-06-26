@@ -1769,6 +1769,12 @@ public final class Settings {
         public static final String SHOW_TOUCHES = "show_touches";
 
         /**
+         * Hardware keyboard layout
+         * @hide
+         */
+        public static final String HARD_KEYBOARD_LAYOUT = "hardware_keyboard_layout";
+
+        /**
          * Log raw orientation data from {@link WindowOrientationListener} for use with the
          * orientationplot.py tool.
          * 0 = no

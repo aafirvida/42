@@ -71,6 +71,13 @@ static void appendInputDeviceConfigurationFileRelativePath(String8& path,
 String8 getInputDeviceConfigurationFilePathByDeviceIdentifier(
         const InputDeviceIdentifier& deviceIdentifier,
         InputDeviceConfigurationFileType type) {
+    return getInputDeviceConfigurationFilePathByDeviceIdentifier(deviceIdentifier, NULL, type);
+}
+
+String8 getInputDeviceConfigurationFilePathByDeviceIdentifier(
+        const InputDeviceIdentifier& deviceIdentifier,
+        char* locale,
+        InputDeviceConfigurationFileType type) {
     if (deviceIdentifier.vendor !=0 && deviceIdentifier.product != 0) {
         if (deviceIdentifier.version != 0) {
             // Try vendor product version.
@@ -78,7 +85,7 @@ String8 getInputDeviceConfigurationFilePathByDeviceIdentifier(
                     String8::format("Vendor_%04x_Product_%04x_Version_%04x",
                             deviceIdentifier.vendor, deviceIdentifier.product,
                             deviceIdentifier.version),
-                    type));
+                    locale, type));
             if (!versionPath.isEmpty()) {
                 return versionPath;
             }
@@ -88,14 +95,29 @@ String8 getInputDeviceConfigurationFilePathByDeviceIdentifier(
         String8 productPath(getInputDeviceConfigurationFilePathByName(
                 String8::format("Vendor_%04x_Product_%04x",
                         deviceIdentifier.vendor, deviceIdentifier.product),
-                type));
+                locale, type));
         if (!productPath.isEmpty()) {
             return productPath;
         }
     }
 
     // Try device name.
-    return getInputDeviceConfigurationFilePathByName(deviceIdentifier.name, type);
+    return getInputDeviceConfigurationFilePathByName(deviceIdentifier.name, locale, type);
+}
+
+String8 getInputDeviceConfigurationFilePathByName(
+        const String8& name, char* locale, InputDeviceConfigurationFileType type) {
+    // if we should look for locale-specific files, do this here first
+    if (locale != NULL) {
+        String8 localName(name);
+        localName.append("_");
+        localName.append(locale);
+        String8 localPath(getInputDeviceConfigurationFilePathByName(localName, type));
+        if (!localPath.isEmpty()) {
+            return localPath;
+        }
+    }
+    return getInputDeviceConfigurationFilePathByName(name, type);
 }
 
 String8 getInputDeviceConfigurationFilePathByName(

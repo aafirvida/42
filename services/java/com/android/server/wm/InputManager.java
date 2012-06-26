@@ -95,6 +95,7 @@ public class InputManager implements Watchdog.Monitor {
             InputChannel toChannel);
     private static native void nativeSetPointerSpeed(int speed);
     private static native void nativeSetShowTouches(boolean enabled);
+    private static native void nativeReloadHardKeyboardLayout();
     private static native String nativeDump();
     private static native void nativeMonitor();
     
@@ -149,6 +150,7 @@ public class InputManager implements Watchdog.Monitor {
 
         registerPointerSpeedSettingObserver();
         registerShowTouchesSettingObserver();
+        registerHardKeyboardLayoutSettingObserver();
 
         updatePointerSpeedFromSettings();
         updateShowTouchesFromSettings();
@@ -470,6 +472,21 @@ public class InputManager implements Watchdog.Monitor {
                     @Override
                     public void onChange(boolean selfChange) {
                         updateShowTouchesFromSettings();
+                    }
+                });
+    }
+
+    public void reloadHardKeyboardLayout() {
+        nativeReloadHardKeyboardLayout();
+    }
+
+    private void registerHardKeyboardLayoutSettingObserver() {
+        mContext.getContentResolver().registerContentObserver(
+                Settings.System.getUriFor(Settings.System.HARD_KEYBOARD_LAYOUT), true,
+                new ContentObserver(mWindowManagerService.mH) {
+                    @Override
+                    public void onChange(boolean selfChange) {
+                        reloadHardKeyboardLayout();
                     }
                 });
     }

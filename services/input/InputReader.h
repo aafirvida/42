@@ -59,6 +59,9 @@ struct InputReaderConfiguration {
         // The visible touches option changed.
         CHANGE_SHOW_TOUCHES = 1 << 3,
 
+        // The visible touches option changed.
+        CHANGE_HARD_KEY_LAYOUT = 1 << 4,
+
         // All devices must be reopened.
         CHANGE_MUST_REOPEN = 1 << 31,
     };

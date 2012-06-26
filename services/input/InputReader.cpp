@@ -490,6 +490,8 @@ void InputReader::refreshConfigurationLocked(uint32_t changes) {
 
         if (changes & InputReaderConfiguration::CHANGE_MUST_REOPEN) {
             mEventHub->requestReopenDevices();
+        } else if (changes & InputReaderConfiguration::CHANGE_HARD_KEY_LAYOUT) {
+                mEventHub->reloadKeyboardLayout();
         } else {
             for (size_t i = 0; i < mDevices.size(); i++) {
                 InputDevice* device = mDevices.valueAt(i);

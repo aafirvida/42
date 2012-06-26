@@ -213,6 +213,9 @@ public:
     /* Requests the EventHub to reopen all input devices on the next call to getEvents(). */
     virtual void requestReopenDevices() = 0;
 
+    /* Forces reload of the layout of all keyboards. */
+    virtual void reloadKeyboardLayout() = 0;
+
     /* Wakes up getEvents() if it is blocked on a read. */
     virtual void wake() = 0;
 
@@ -269,6 +272,7 @@ public:
     virtual String8 getKeyCharacterMapFile(int32_t deviceId) const;
 
     virtual void requestReopenDevices();
+    virtual void reloadKeyboardLayout();
 
     virtual void wake();
 

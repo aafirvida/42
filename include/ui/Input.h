@@ -884,6 +884,22 @@ extern String8 getInputDeviceConfigurationFilePathByDeviceIdentifier(
  * Gets the path of an input device configuration file, if one is available.
  * Considers both system provided and user installed configuration files.
  *
+ * The device identifier is used to construct several default configuration file
+ * names to try based on the device name, vendor, product, and version.
+ *
+ * Additionally, a locale is appended to the filename to load local keymaps.
+ *
+ * Returns an empty string if not found.
+ */
+extern String8 getInputDeviceConfigurationFilePathByDeviceIdentifier(
+        const InputDeviceIdentifier& deviceIdentifier,
+        char * locale,
+        InputDeviceConfigurationFileType type);
+
+/*
+ * Gets the path of an input device configuration file, if one is available.
+ * Considers both system provided and user installed configuration files.
+ *
  * The name is case-sensitive and is used to construct the filename to resolve.
  * All characters except 'a'-'z', 'A'-'Z', '0'-'9', '-', and '_' are replaced by underscores.
  *
@@ -891,6 +907,22 @@ extern String8 getInputDeviceConfigurationFilePathByDeviceIdentifier(
  */
 extern String8 getInputDeviceConfigurationFilePathByName(
         const String8& name, InputDeviceConfigurationFileType type);
+
+/*
+ * Gets the path of an input device configuration file, if one is available.
+ * Considers both system provided and user installed configuration files.
+ *
+ * The name is case-sensitive and is used to construct the filename to resolve.
+ * All characters except 'a'-'z', 'A'-'Z', '0'-'9', '-', and '_' are replaced by underscores.
+ *
+ * Additionally, a locale is appended to the filename to load local keymaps.
+ *
+ * Returns an empty string if not found.
+ */
+extern String8 getInputDeviceConfigurationFilePathByName(
+        const String8& name,
+        char* locale,
+        InputDeviceConfigurationFileType type);
 
 } // namespace android
 

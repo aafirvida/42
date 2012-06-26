@@ -146,9 +146,14 @@ status_t KeyMap::loadKeyCharacterMap(const InputDeviceIdentifier& deviceIdentifi
 
 String8 KeyMap::getPath(const InputDeviceIdentifier& deviceIdentifier,
         const String8& name, InputDeviceConfigurationFileType type) {
+    char keyboardLocale[PROPERTY_VALUE_MAX];
+    if (property_get("persist.sys.keyboard.locale", keyboardLocale, "sys")
+            && strcmp(keyboardLocale, "sys") == 0) {
+        property_get("persist.sys.language", keyboardLocale, NULL);
+    }
     return name.isEmpty()
-            ? getInputDeviceConfigurationFilePathByDeviceIdentifier(deviceIdentifier, type)
-            : getInputDeviceConfigurationFilePathByName(name, type);
+            ? getInputDeviceConfigurationFilePathByDeviceIdentifier(deviceIdentifier, keyboardLocale, type)
+            : getInputDeviceConfigurationFilePathByName(name, keyboardLocale, type);
 }
 
 

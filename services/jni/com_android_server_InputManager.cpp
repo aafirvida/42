@@ -187,6 +187,7 @@ public:
     void setSystemUiVisibility(int32_t visibility);
     void setPointerSpeed(int32_t speed);
     void setShowTouches(bool enabled);
+    void reloadHardKeyboardLayout();
 
     /* --- InputReaderPolicyInterface implementation --- */
 
@@ -708,6 +709,13 @@ void NativeInputManager::setShowTouches(bool enabled) {
 
     mInputManager->getReader()->requestRefreshConfiguration(
             InputReaderConfiguration::CHANGE_SHOW_TOUCHES);
+}
+
+void NativeInputManager::reloadHardKeyboardLayout() {
+    LOGI("Reloading hardware keyboard layout");
+
+    mInputManager->getReader()->requestRefreshConfiguration(
+            InputReaderConfiguration::CHANGE_HARD_KEY_LAYOUT);
 }
 
 bool NativeInputManager::isScreenOn() {
@@ -1325,6 +1333,15 @@ static void android_server_InputManager_nativeSetShowTouches(JNIEnv* env,
     gNativeInputManager->setShowTouches(enabled);
 }
 
+static void android_server_InputManager_nativeReloadHardKeyboardLayout(JNIEnv* env,
+        jclass clazz) {
+    if (checkInputManagerUnitialized(env)) {
+        return;
+    }
+
+    gNativeInputManager->reloadHardKeyboardLayout();
+}
+
 static jstring android_server_InputManager_nativeDump(JNIEnv* env, jclass clazz) {
     if (checkInputManagerUnitialized(env)) {
         return NULL;
@@ -1394,6 +1411,8 @@ static JNINativeMethod gInputManagerMethods[] = {
             (void*) android_server_InputManager_nativeSetPointerSpeed },
     { "nativeSetShowTouches", "(Z)V",
             (void*) android_server_InputManager_nativeSetShowTouches },
+    { "nativeReloadHardKeyboardLayout", "()V",
+            (void*) android_server_InputManager_nativeReloadHardKeyboardLayout },
     { "nativeDump", "()Ljava/lang/String;",
             (void*) android_server_InputManager_nativeDump },
     { "nativeMonitor", "()V",
