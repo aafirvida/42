@@ -626,6 +626,9 @@ private:
     virtual void requestReopenDevices() {
     }
 
+    virtual void reloadKeyboardLayout() {
+    }
+
     virtual void wake() {
     }
 };
