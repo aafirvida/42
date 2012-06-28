@@ -31,6 +31,7 @@ keylayouts := \
 keycharmaps := \
     Generic.kcm \
     Generic_de.kcm \
+    Generic_it.kcm \
     Virtual.kcm \
     qwerty.kcm \
     qwerty2.kcm

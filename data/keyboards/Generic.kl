@@ -105,7 +105,7 @@ key 82    NUMPAD_0
 key 83    NUMPAD_DOT
 # key 84 (undefined)
 # key 85 "KEY_ZENKAKUHANKAKU"
-key 86    BACKSLASH
+key 86    BUTTON_1
 key 87    F11
 key 88    F12
 # key 89 "KEY_RO"
@@ -264,7 +264,7 @@ key 269   BUTTON_14
 key 270   BUTTON_15
 key 271   BUTTON_16
 
-key 288   BUTTON_1
+#key 288   BUTTON_1
 key 289   BUTTON_2
 key 290   BUTTON_3
 key 291   BUTTON_4

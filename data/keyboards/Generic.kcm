@@ -368,6 +368,12 @@ key BACKSLASH {
     ctrl, alt, meta:                    none
 }
 
+key BUTTON_1 {
+    base:                               '\\'
+    shift:                              '|'
+    ctrl, alt, meta:                    none
+}
+
 key SEMICOLON {
     label, number:                      ';'
     base:                               ';'
@@ -605,10 +611,6 @@ key BUTTON_SELECT {
 
 key BUTTON_MODE {
     base:                               fallback MENU
-}
-
-key BUTTON_1 {
-    base:                               fallback DPAD_CENTER
 }
 
 key BUTTON_2 {
