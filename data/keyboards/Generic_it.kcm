@@ -216,7 +216,7 @@ key Z {
 key 0 {
     label, number:                      '0'
     base:                               '0'
-    shift:                              ')'
+    shift:                              '='
     ctrl, alt, meta:                    none
 }
 
@@ -344,7 +344,7 @@ key MINUS {
 key EQUALS {
     label, number:                      '='
     base:                               '\u00ec'
-    shift:                              '\u00ed'
+    shift:                              '^'
     ctrl, alt, meta:                    none
 }
 
