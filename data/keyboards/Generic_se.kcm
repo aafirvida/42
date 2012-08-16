@@ -13,7 +13,7 @@
 # limitations under the License.
 
 #
-# Generic key character map for full alphabetic Norwegian PC style external keyboards.
+# Generic key character map for full alphabetic Swedish/Suomi PC style external keyboards.
 #
 # This file is intentionally very generic and is intended to support a broad rang of keyboards.
 # Do not edit the generic key character map to support a specific keyboard; instead, create
@@ -116,7 +116,7 @@ key M {
     label:                              'M'
     base:                               'm'
     shift, capslock:                    'M'
-    ctrl, alt, meta:                    none
+    ctrl, alt, meta:                    '\u03bc'
 }
 
 key N {
@@ -252,7 +252,7 @@ key 5 {
     label, number:                      '5'
     base:                               '5'
     shift:                              '%'
-    ctrl, alt, meta:                    none
+    ctrl, alt, meta:                    '\u20ac'
 }
 
 key 6 {
@@ -325,8 +325,8 @@ key SLASH {
 
 key GRAVE {
     label, number:                      '`'
-    base:                               '\u007c'
-    shift:                              '\u00a7'
+    base:                               '\u00a7'
+    shift:                              '\u00bd'
     alt:                                '\u00a6'
     alt+shift:                          '\u00b6'
     ctrl, meta:                         none
@@ -341,9 +341,9 @@ key MINUS {
 
 key EQUALS {
     label, number:                      '='
-    base:                               '\\'
+    base:                               '\u0301'
     shift:                              '\u0300'
-    ctrl, alt, meta:                    '\u0301'
+    ctrl, alt, meta:                    none
 }
 
 key LEFT_BRACKET {
@@ -376,15 +376,15 @@ key BUTTON_1 {
 
 key SEMICOLON {
     label, number:                      ';'
-    base:                               '\u00f8'
-    shift:                              '\u00d8'
+    base:                               '\u00f6'
+    shift:                              '\u00d6'
     ctrl, alt, meta:                    none
 }
 
 key APOSTROPHE {
     label, number:                      '\''
-    base:                               '\u00e6'
-    shift:                              '\u00c6'
+    base:                               '\u00e4'
+    shift:                              '\u00c4'
     ctrl, alt, meta:                    none
 }
 
