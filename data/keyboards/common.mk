@@ -36,6 +36,7 @@ keycharmaps := \
     Generic_fr.kcm \
     Generic_it.kcm \
     Generic_no.kcm \
+    Generic_ru.kcm \
     Generic_se.kcm \
     Virtual.kcm \
     qwerty.kcm \
