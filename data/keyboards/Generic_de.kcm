@@ -145,7 +145,7 @@ key Q {
     label:                              'Q'
     base:                               'q'
     shift, capslock:                    'Q'
-    ctrl, alt, meta:                    none
+    ctrl, alt, meta:                    '@'
 }
 
 key R {
