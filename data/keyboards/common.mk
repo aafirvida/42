@@ -30,6 +30,7 @@ keylayouts := \
 
 keycharmaps := \
     Generic.kcm \
+    Generic_be.kcm \
     Generic_de.kcm \
     Generic_dk.kcm \
     Generic_fi.kcm \
