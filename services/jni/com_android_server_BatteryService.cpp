@@ -196,20 +196,18 @@ static void setVoltageField(JNIEnv* env, jobject obj, const char* path, jfieldID
 }
 
 static void setChargeLevel(JNIEnv* env, jobject obj, jfieldID fieldID) {
-    float now,full;
-    int value = 0;
-    char buf[128];
+    char buf1[128], buf2[128];
 
-    if (readFromFile(gPaths.batteryChargeNowPath, buf, 128) > 0 ) {
-        now = atoi(buf);
-        if (readFromFile(gPaths.batteryChargeFullPath, buf, 128) > 0 ) {
-            full = atoi(buf);
-            value = (int)((now/full) * 100);
-        } else {
-            value = now;
-        }
+    if (readFromFile(gPaths.batteryChargeNowPath, buf1, 128) > 0 &&
+            readFromFile(gPaths.batteryChargeFullPath, buf2, 128) > 0) {
+        jint value = atoi(buf1) * 100 / atoi(buf2);
+        env->SetIntField(obj, fieldID, value);
+        LOGV("setChargeLevel value=%d", value);
     }
-    env->SetIntField(obj, fieldID, value);
+    /*
+     * In some cases the battery path may just disappear a while.
+     * Do not set 0 in such cases to avoid shutdown suddenly.
+     */
 }
 
 static void android_server_BatteryService_update(JNIEnv* env, jobject obj)
@@ -226,7 +224,7 @@ static void android_server_BatteryService_update(JNIEnv* env, jobject obj)
         if (gPaths.batteryCapacityPath) {
             setIntField(env, obj, gPaths.batteryCapacityPath, gFieldIds.mBatteryLevel);
         } else {
-            setChargeLevel(env,obj, gFieldIds.mBatteryLevel);
+            setChargeLevel(env, obj, gFieldIds.mBatteryLevel);
         }
     } else {
         /*This is a PC or VM, faking the level to full, we are on AC anyway */

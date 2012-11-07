@@ -44,7 +44,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
-
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * <p>BatteryService monitors the charging status, and charge level of the device
@@ -129,6 +130,7 @@ class BatteryService extends Binder {
         mContext = context;
         mLed = new Led(context, lights);
         mBatteryStats = BatteryStatsService.getService();
+        mBatteryLevel = -1; // initialize to an invalid value
 
         mCriticalBatteryLevel = mContext.getResources().getInteger(
                 com.android.internal.R.integer.config_criticalBatteryWarningLevel);
@@ -144,18 +146,14 @@ class BatteryService extends Binder {
             mInvalidChargerObserver.startObserving("DEVPATH=/devices/virtual/switch/invalid_charger");
         }
 
-        // start polling
-        new Thread(new Runnable() {
+        // Some boards have buggy power_supply uevents
+        // Start a timer to update battery level periodically
+        new Timer("BatteryUpdateTimer").schedule(new TimerTask() {
+            @Override
             public void run() {
-                while (true) {
-                    update();
-                    try {
-                        Thread.sleep(30);
-                    } catch (InterruptedException e) {
-                    }
-                }
+                update();
             }
-        }, "BatteryServiceUpdateThread").start();
+        }, 0, 30000);
     }
 
     final boolean isPowered() {
@@ -219,6 +217,7 @@ class BatteryService extends Binder {
         // shut down gracefully if our battery is critically low and we are not powered.
         // wait until the system has booted before attempting to display the shutdown dialog.
         if (mBatteryLevel == 0 && !isPowered() && ActivityManagerNative.isSystemReady()) {
+            Slog.w(TAG, "shutdownIfNoPower!!!");
             Intent intent = new Intent(Intent.ACTION_REQUEST_SHUTDOWN);
             intent.putExtra(Intent.EXTRA_KEY_CONFIRM, false);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -230,6 +229,7 @@ class BatteryService extends Binder {
         // shut down gracefully if temperature is too high (> 68.0C)
         // wait until the system has booted before attempting to display the shutdown dialog.
         if (mBatteryTemperature > 680 && ActivityManagerNative.isSystemReady()) {
+            Slog.w(TAG, "shutdownIfOverTemp!!!");
             Intent intent = new Intent(Intent.ACTION_REQUEST_SHUTDOWN);
             intent.putExtra(Intent.EXTRA_KEY_CONFIRM, false);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -242,6 +242,7 @@ class BatteryService extends Binder {
     private synchronized final void update() {
         native_update();
         processValues();
+        Slog.v(TAG, "update battery level = " + mBatteryLevel);
     }
 
     private void processValues() {
