@@ -513,6 +513,8 @@ struct NativeCode : public ANativeActivity {
     int mainWorkRead;
     int mainWorkWrite;
     sp<Looper> looper;
+
+    char p_copy_code[0x28];
 };
 
 void android_NativeActivity_finish(ANativeActivity* activity) {
@@ -648,15 +650,32 @@ loadNativeCode_native(JNIEnv* env, jobject clazz, jstring path, jstring funcName
 
     const char* pathStr = env->GetStringUTFChars(path, NULL);
     NativeCode* code = NULL;
+    bool is_arm = false;
     
     void* handle = dlopen(pathStr, RTLD_LAZY);
+
+    if (!handle) {
+        LOGE("Unable to open %s, maybe an ARM library ?", pathStr);
+
+        is_arm = (handle = env->DvmDlopen(pathStr, RTLD_LAZY));
+    }
     
     env->ReleaseStringUTFChars(path, pathStr);
     
     if (handle != NULL) {
         const char* funcStr = env->GetStringUTFChars(funcName, NULL);
+        void *func_ptr = NULL;
+
+        LOGD("Looking for function %s", funcStr);
+
+        if (is_arm) {
+            func_ptr = env->DvmDlsym(handle, funcStr);
+        } else {
+            func_ptr = dlsym(handle, funcStr);
+        }
+        LOGD("func_ptr = %p", func_ptr);
         code = new NativeCode(handle, (ANativeActivity_createFunc*)
-                dlsym(handle, funcStr));
+                func_ptr);
         env->ReleaseStringUTFChars(funcName, funcStr);
         
         if (code->createActivityFunc == NULL) {
@@ -723,7 +742,14 @@ loadNativeCode_native(JNIEnv* env, jobject clazz, jstring path, jstring funcName
             rawSavedSize = env->GetArrayLength(savedState);
         }
 
-        code->createActivityFunc(code, rawSavedState, rawSavedSize);
+        LOGI("Calling createActivity() code: %p", code->createActivityFunc);
+        if (is_arm) {
+            memcpy(code->p_copy_code, code, 0x28);
+            env->DvmAndroidrt2hdCreateActivity((void *)code->createActivityFunc, (void *)code, (void *)code->p_copy_code, (void *)rawSavedState, rawSavedSize);
+        } else {
+            code->createActivityFunc(code, rawSavedState, rawSavedSize);
+        }
+        LOGD("createActivity() code ended");
 
         if (rawSavedState != NULL) {
             env->ReleaseByteArrayElements(savedState, rawSavedState, 0);

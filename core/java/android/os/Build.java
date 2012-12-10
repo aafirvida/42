@@ -46,6 +46,9 @@ public class Build {
     /** The name of the second instruction set (CPU type + ABI convention) of native code. */
     public static final String CPU_ABI2 = getString("ro.product.cpu.abi2");
 
+    /** The name of the thirs instruction set (CPU type + ABI convention) of native code. */
+    public static final String CPU_ABI3 = getString("ro.product.cpu.abi3");
+
     /** The manufacturer of the product/hardware. */
     public static final String MANUFACTURER = getString("ro.product.manufacturer");
 

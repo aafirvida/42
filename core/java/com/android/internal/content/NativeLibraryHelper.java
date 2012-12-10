@@ -31,7 +31,7 @@ public class NativeLibraryHelper {
 
     private static final boolean DEBUG_NATIVE = false;
 
-    private static native long nativeSumNativeBinaries(String file, String cpuAbi, String cpuAbi2);
+    private static native long nativeSumNativeBinaries(String file, String cpuAbi, String cpuAbi2, String cpuAbi3);
 
     /**
      * Sums the size of native binaries in an APK.
@@ -42,11 +42,12 @@ public class NativeLibraryHelper {
     public static long sumNativeBinariesLI(File apkFile) {
         final String cpuAbi = Build.CPU_ABI;
         final String cpuAbi2 = Build.CPU_ABI2;
-        return nativeSumNativeBinaries(apkFile.getPath(), cpuAbi, cpuAbi2);
+        final String cpuAbi3 = Build.CPU_ABI3;
+        return nativeSumNativeBinaries(apkFile.getPath(), cpuAbi, cpuAbi2, cpuAbi3);
     }
 
     private native static int nativeCopyNativeBinaries(String filePath, String sharedLibraryPath,
-            String cpuAbi, String cpuAbi2);
+            String cpuAbi, String cpuAbi2, String cpuAbi3);
 
     /**
      * Copies native binaries to a shared library directory.
@@ -59,8 +60,9 @@ public class NativeLibraryHelper {
     public static int copyNativeBinariesIfNeededLI(File apkFile, File sharedLibraryDir) {
         final String cpuAbi = Build.CPU_ABI;
         final String cpuAbi2 = Build.CPU_ABI2;
+        final String cpuAbi3 = Build.CPU_ABI3;
         return nativeCopyNativeBinaries(apkFile.getPath(), sharedLibraryDir.getPath(), cpuAbi,
-                cpuAbi2);
+                cpuAbi2, cpuAbi3);
     }
 
     // Convenience method to call removeNativeBinariesFromDirLI(File)
