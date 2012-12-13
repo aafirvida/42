@@ -647,6 +647,25 @@ class QuickSettings {
             }
         });
         parent.addView(locationTile);
+
+        // Power off
+        QuickSettingsTileView powerOffTile = (QuickSettingsTileView)
+                inflater.inflate(R.layout.quick_settings_tile, parent, false);
+        powerOffTile.setContent(R.layout.quick_settings_tile_poweroff, inflater);
+        powerOffTile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                  onClickPowerOff();
+            }
+        });
+        mModel.addPowerOffTile(powerOffTile, new QuickSettingsModel.RefreshCallback() {
+            @Override
+            public void refreshView(QuickSettingsTileView view, State state) {
+                TextView tv = (TextView) view.findViewById(R.id.poweroff_tileview);
+                tv.setText(state.label);
+            }
+        });
+        parent.addView(powerOffTile);
     }
 
     private void addTemporaryTiles(final ViewGroup parent, final LayoutInflater inflater) {
@@ -917,5 +936,32 @@ class QuickSettings {
                     .start();
             }
         }
+    }
+
+    // Power off
+    // ----------------------------
+    private void onClickPowerOff() {
+        if (mBar != null) {
+            mBar.collapseAllPanels(true);
+        }
+
+        // Create dialog to get user confirmation
+        final AlertDialog dialog = new AlertDialog.Builder(mContext)
+                    .setTitle(com.android.internal.R.string.power_off)
+                    .setMessage(com.android.internal.R.string.shutdown_confirm_question)
+                    .setPositiveButton(com.android.internal.R.string.yes,
+                        new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Send request to start ShutdownActivity
+                            Intent intent = new Intent(Intent.ACTION_REQUEST_SHUTDOWN);
+                            intent.putExtra(Intent.EXTRA_KEY_CONFIRM, false);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            mContext.startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton(com.android.internal.R.string.no, null)
+                    .create();
+        dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
+        dialog.show();
     }
 }

@@ -301,6 +301,10 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
 
     private RotationLockController mRotationLockController;
 
+    private QuickSettingsTileView mPowerOffTile;
+    private RefreshCallback mPowerOffCallback;
+    private State mPowerOffState = new State();
+
     public QuickSettingsModel(Context context) {
         mContext = context;
         mHandler = new Handler();
@@ -864,5 +868,17 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         }
         mSslCaCertWarningState.label = r.getString(R.string.ssl_ca_cert_warning);
         mSslCaCertWarningCallback.refreshView(mSslCaCertWarningTile, mSslCaCertWarningState);
+    }
+
+    // Power off
+    void addPowerOffTile(QuickSettingsTileView view, RefreshCallback cb) {
+        mPowerOffTile = view;
+        mPowerOffCallback = cb;
+        refreshPowerOffTile();
+    }
+    void refreshPowerOffTile() {
+        Resources r = mContext.getResources();
+        mPowerOffState.label = r.getString(R.string.quick_settings_poweroff_label);
+        mPowerOffCallback.refreshView(mPowerOffTile, mPowerOffState);
     }
 }
