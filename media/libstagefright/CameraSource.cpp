@@ -487,6 +487,7 @@ status_t CameraSource::initWithCameraAccess(
         bool storeMetaDataInVideoBuffers) {
     LOGV("initWithCameraAccess");
     status_t err = OK;
+    char buffer[4];
 
     if ((err = isCameraAvailable(camera, proxy, cameraId)) != OK) {
         LOGE("Camera connection could not be established.");
@@ -495,6 +496,15 @@ status_t CameraSource::initWithCameraAccess(
     CameraParameters params(mCamera->getParameters());
     if ((err = isCameraColorFormatSupported(params)) != OK) {
         return err;
+    }
+    const char* supportedFrameRates =
+            params.get(CameraParameters::KEY_SUPPORTED_PREVIEW_FRAME_RATES);
+    CHECK(supportedFrameRates != NULL);
+    snprintf(buffer, 4, "%d", frameRate);
+    if (strstr(supportedFrameRates, buffer) == NULL) {
+        frameRate = atoi(supportedFrameRates);
+    } else {
+        frameRate = params.getPreviewFrameRate();
     }
 
     // Set the camera to use the requested video frame size
