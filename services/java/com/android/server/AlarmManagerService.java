@@ -165,6 +165,15 @@ class AlarmManagerService extends IAlarmManager.Stub {
             Slog.w(TAG, "set/setRepeating ignored because there is no intent");
             return;
         }
+        if (type == AlarmManager.RTC_WAKEUP ||
+                type == AlarmManager.ELAPSED_REALTIME_WAKEUP) {
+            String creator = operation.getTargetPackage();
+            if (!(creator.equals("com.android.deskclock") ||
+                  creator.equals("com.android.providers.calendar"))) {
+                Slog.i(TAG, "_WAKEUP alarm rejected for " + creator);
+                type += 1;
+            }
+        }
         synchronized (mLock) {
             Alarm alarm = new Alarm();
             alarm.type = type;
