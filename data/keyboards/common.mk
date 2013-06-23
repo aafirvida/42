@@ -31,13 +31,23 @@ keylayouts := \
 keycharmaps := \
     Generic.kcm \
     Generic_be.kcm \
-    Generic_de.kcm \
-    Generic_dk.kcm \
+    Generic_da_DK.kcm \
+    Generic_de_CH.kcm \
+    Generic_de_DE.kcm \
+    Generic_en_GB.kcm \
+    Generic_en_US.kcm \
+    Generic_es_ES.kcm \
+    Generic_es_US.kcm \
     Generic_fi.kcm \
-    Generic_fr.kcm \
-    Generic_it.kcm \
+    Generic_fr_BE.kcm \
+    Generic_fr_CH.kcm \
+    Generic_fr_FR.kcm \
+    Generic_it_IT.kcm \
+    Generic_nl_NL.kcm \
     Generic_no.kcm \
-    Generic_ru.kcm \
+    Generic_pt_BR.kcm \
+    Generic_pt_PT.kcm \
+    Generic_ru_RU.kcm \
     Generic_se.kcm \
     Virtual.kcm \
     qwerty.kcm \
