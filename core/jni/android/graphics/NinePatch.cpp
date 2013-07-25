@@ -77,7 +77,7 @@ public:
 
     static void finalize(JNIEnv* env, jobject, int8_t* patch) {
 #ifdef USE_OPENGL_RENDERER
-        if (android::uirenderer::Caches::hasInstance()) {
+        if (GraphicsJNI::useOpenglRenderer() && android::uirenderer::Caches::hasInstance()) {
             Res_png_9patch* p = (Res_png_9patch*) patch;
             android::uirenderer::Caches::getInstance().resourceCache.destructor(p);
             return;

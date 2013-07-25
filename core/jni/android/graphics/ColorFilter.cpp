@@ -36,6 +36,7 @@ public:
         SkSafeUnref(obj);
         // f == NULL when not !USE_OPENGL_RENDERER, so no need to delete outside the ifdef
 #ifdef USE_OPENGL_RENDERER
+        if (!GraphicsJNI::useOpenglRenderer()) return;
         if (android::uirenderer::Caches::hasInstance()) {
             android::uirenderer::Caches::getInstance().resourceCache.destructor(f);
         } else {
@@ -47,6 +48,7 @@ public:
     static SkiaColorFilter* glCreatePorterDuffFilter(JNIEnv* env, jobject, SkColorFilter *skFilter,
             jint srcColor, SkPorterDuff::Mode mode) {
 #ifdef USE_OPENGL_RENDERER
+        if (!GraphicsJNI::useOpenglRenderer()) return NULL;
         return new SkiaBlendFilter(skFilter, srcColor, SkPorterDuff::ToXfermodeMode(mode));
 #else
         return NULL;
@@ -56,6 +58,7 @@ public:
     static SkiaColorFilter* glCreateLightingFilter(JNIEnv* env, jobject, SkColorFilter *skFilter,
             jint mul, jint add) {
 #ifdef USE_OPENGL_RENDERER
+        if (!GraphicsJNI::useOpenglRenderer()) return NULL;
         return new SkiaLightingFilter(skFilter, mul, add);
 #else
         return NULL;
@@ -65,6 +68,7 @@ public:
     static SkiaColorFilter* glCreateColorMatrixFilter(JNIEnv* env, jobject, SkColorFilter *skFilter,
             jfloatArray jarray) {
 #ifdef USE_OPENGL_RENDERER
+        if (!GraphicsJNI::useOpenglRenderer()) return NULL;
         AutoJavaFloatArray autoArray(env, jarray, 20);
         const float* src = autoArray.ptr();
 
