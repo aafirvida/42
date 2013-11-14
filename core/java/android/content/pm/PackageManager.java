@@ -363,6 +363,15 @@ public abstract class PackageManager {
     public static final int INSTALL_SUCCEEDED = 1;
 
     /**
+     * Native Library Copy return code: this is passed to {@link PackageManagerService} by
+     * {@link NativeLibararyHelper} on successful copy of native library.
+     * It indicates that the native library being copied matches 2nd ABI.
+     * @hide
+     */
+
+    public static final int INSTALL_ABI2_SUCCEEDED = 2;
+
+    /**
      * Installation return code: this is passed to the {@link IPackageInstallObserver} by
      * {@link #installPackage(android.net.Uri, IPackageInstallObserver, int)} if the package is
      * already installed.
