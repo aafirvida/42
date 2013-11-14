@@ -228,6 +228,12 @@ ifeq ($(WITH_MALLOC_LEAK_CHECK),true)
 	LOCAL_CFLAGS += -DMALLOC_LEAK_CHECK
 endif
 
+ifeq ($(INTEL_HOUDINI), true)
+    LOCAL_CFLAGS += -DWITH_HOUDINI
+	LOCAL_SHARED_LIBRARIES += libdvm
+    LOCAL_STATIC_LIBRARIES += libhoudini_hook
+endif
+
 LOCAL_MODULE:= libandroid_runtime
 
 include external/stlport/libstlport.mk
