@@ -998,7 +998,16 @@ static const int32_t GAMEPAD_KEYCODES[] = {
 };
 
 status_t EventHub::openDeviceLocked(const char *devicePath) {
+    return openDeviceLocked(devicePath, false);
+}
+
+status_t EventHub::openDeviceLocked(const char *devicePath, bool ignoreAlreadyOpened) {
     char buffer[80];
+
+    if (ignoreAlreadyOpened && (getDeviceByPathLocked(devicePath) != 0)) {
+        ALOGV("Ignoring device '%s' that has already been opened.", devicePath);
+        return 0;
+    }
 
     ALOGV("Opening device: %s", devicePath);
 
@@ -1197,7 +1206,11 @@ status_t EventHub::openDeviceLocked(const char *devicePath) {
 
         // 'Q' key support = cheap test of whether this is an alpha-capable kbd
         if (hasKeycodeLocked(device, AKEYCODE_Q)) {
-            device->classes |= INPUT_DEVICE_CLASS_ALPHAKEY;
+            char value[PROPERTY_VALUE_MAX];
+            property_get("ro.ignore_atkbd", value, "0");
+            if ((device->identifier.name != "AT Translated Set 2 keyboard") || (!atoi(value))) {
+                device->classes |= INPUT_DEVICE_CLASS_ALPHAKEY;
+            }
         }
 
         // See if this device has a DPAD.
@@ -1492,7 +1505,7 @@ status_t EventHub::readNotifyLocked() {
         if(event->len) {
             strcpy(filename, event->name);
             if(event->mask & IN_CREATE) {
-                openDeviceLocked(devname);
+                openDeviceLocked(devname, true);
             } else {
                 ALOGI("Removing device '%s' due to inotify event\n", devname);
                 closeDeviceByPathLocked(devname);
