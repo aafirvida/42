@@ -3479,6 +3479,16 @@ void TouchInputMapper::parseCalibration() {
                     coverageCalibrationString.string());
         }
     }
+
+    // Get 5-point calibration parameters
+    FILE *file = fopen("/data/system/tslib/pointercal", "r");
+    int *p = out.fiveCal;
+    if (file) {
+        fscanf(file, "%d %d %d %d %d %d %d", &p[0], &p[1], &p[2], &p[3], &p[4], &p[5], &p[6]);
+        fclose(file);
+    } else {
+        p[6] = 0;
+    }
 }
 
 void TouchInputMapper::resolveCalibration() {
@@ -4249,13 +4259,27 @@ void TouchInputMapper::cookPointerData() {
             break;
         }
 
+        float x_temp = float(in.x - mRawPointerAxes.x.minValue);
+        float y_temp = float(in.y - mRawPointerAxes.y.minValue);
+        float x_cal, y_cal;
+        int *p = mCalibration.fiveCal;
+        if (p[6]) {
+            // Apply 5-point calibration algorithm
+            x_cal = (x_temp * p[0] + y_temp * p[1] + p[2] ) / p[6];
+            y_cal = (x_temp * p[3] + y_temp * p[4] + p[5] ) / p[6];
+            ALOGV("5cal: x_temp=%f y_temp=%f x_cal=%f y_cal=%f", x_temp, y_temp, x_cal, y_cal);
+        } else {
+            x_cal = x_temp * mXScale;
+            y_cal = y_temp * mYScale;
+        }
+
         // X, Y, and the bounding box for coverage information
         // Adjust coords for surface orientation.
         float x, y, left, top, right, bottom;
         switch (mSurfaceOrientation) {
         case DISPLAY_ORIENTATION_90:
-            x = float(in.y - mRawPointerAxes.y.minValue) * mYScale + mYTranslate;
-            y = float(mRawPointerAxes.x.maxValue - in.x) * mXScale + mXTranslate;
+            x = y_cal + mYTranslate;
+            y = mSurfaceWidth - x_cal + mXTranslate;
             left = float(rawTop - mRawPointerAxes.y.minValue) * mYScale + mYTranslate;
             right = float(rawBottom- mRawPointerAxes.y.minValue) * mYScale + mYTranslate;
             bottom = float(mRawPointerAxes.x.maxValue - rawLeft) * mXScale + mXTranslate;
@@ -4266,8 +4290,8 @@ void TouchInputMapper::cookPointerData() {
             }
             break;
         case DISPLAY_ORIENTATION_180:
-            x = float(mRawPointerAxes.x.maxValue - in.x) * mXScale + mXTranslate;
-            y = float(mRawPointerAxes.y.maxValue - in.y) * mYScale + mYTranslate;
+            x = mSurfaceWidth - x_cal + mXTranslate;
+            y = mSurfaceHeight - y_cal + mYTranslate;
             left = float(mRawPointerAxes.x.maxValue - rawRight) * mXScale + mXTranslate;
             right = float(mRawPointerAxes.x.maxValue - rawLeft) * mXScale + mXTranslate;
             bottom = float(mRawPointerAxes.y.maxValue - rawTop) * mYScale + mYTranslate;
@@ -4278,8 +4302,8 @@ void TouchInputMapper::cookPointerData() {
             }
             break;
         case DISPLAY_ORIENTATION_270:
-            x = float(mRawPointerAxes.y.maxValue - in.y) * mYScale + mYTranslate;
-            y = float(in.x - mRawPointerAxes.x.minValue) * mXScale + mXTranslate;
+            x = mSurfaceHeight - y_cal + mYTranslate;
+            y = x_cal + mXTranslate;
             left = float(mRawPointerAxes.y.maxValue - rawBottom) * mYScale + mYTranslate;
             right = float(mRawPointerAxes.y.maxValue - rawTop) * mYScale + mYTranslate;
             bottom = float(rawRight - mRawPointerAxes.x.minValue) * mXScale + mXTranslate;
@@ -4290,8 +4314,8 @@ void TouchInputMapper::cookPointerData() {
             }
             break;
         default:
-            x = float(in.x - mRawPointerAxes.x.minValue) * mXScale + mXTranslate;
-            y = float(in.y - mRawPointerAxes.y.minValue) * mYScale + mYTranslate;
+            x = x_cal + mXTranslate;
+            y = y_cal + mYTranslate;
             left = float(rawLeft - mRawPointerAxes.x.minValue) * mXScale + mXTranslate;
             right = float(rawRight - mRawPointerAxes.x.minValue) * mXScale + mXTranslate;
             bottom = float(rawBottom - mRawPointerAxes.y.minValue) * mYScale + mYTranslate;
