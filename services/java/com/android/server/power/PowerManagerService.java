@@ -2712,7 +2712,6 @@ public final class PowerManagerService extends IPowerManager.Stub
         public void blankAllDisplays() {
             synchronized (this) {
                 mBlanked = true;
-                mDisplayManagerService.blankAllDisplaysFromPowerManager();
                 nativeSetInteractive(false);
                 nativeSetAutoSuspend(true);
             }
@@ -2723,7 +2722,6 @@ public final class PowerManagerService extends IPowerManager.Stub
             synchronized (this) {
                 nativeSetAutoSuspend(false);
                 nativeSetInteractive(true);
-                mDisplayManagerService.unblankAllDisplaysFromPowerManager();
                 mBlanked = false;
             }
         }
