@@ -2757,6 +2757,19 @@ void TouchInputMapper::configure(nsecs_t when,
         configureSurface(when, &resetNeeded);
     }
 
+    if (!changes || (changes & InputReaderConfiguration::CHANGE_DEVICE_ALIAS)) {
+        // Get 5-point calibration parameters
+        int *p = mCalibration.fiveCal;
+        p[6] = 0;
+        if (FILE *file = fopen("/data/misc/tscal/pointercal", "r")) {
+            if (fscanf(file, "%d %d %d %d %d %d %d", &p[0], &p[1], &p[2], &p[3], &p[4], &p[5], &p[6]) == 7) {
+                p[0] *= mXScale, p[1] *= mYScale, p[3] *= mXScale, p[4] *= mYScale;
+                ALOGD("pointercal loaded ok");
+            }
+            fclose(file);
+        }
+    }
+
     if (changes && resetNeeded) {
         // Send reset, unless this is the first time the device has been configured,
         // in which case the reader will call reset itself after all mappers are ready.
@@ -3478,16 +3491,6 @@ void TouchInputMapper::parseCalibration() {
             ALOGW("Invalid value for touch.coverage.calibration: '%s'",
                     coverageCalibrationString.string());
         }
-    }
-
-    // Get 5-point calibration parameters
-    FILE *file = fopen("/data/system/tslib/pointercal", "r");
-    int *p = out.fiveCal;
-    if (file) {
-        fscanf(file, "%d %d %d %d %d %d %d", &p[0], &p[1], &p[2], &p[3], &p[4], &p[5], &p[6]);
-        fclose(file);
-    } else {
-        p[6] = 0;
     }
 }
 

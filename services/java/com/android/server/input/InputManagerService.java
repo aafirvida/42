@@ -51,6 +51,7 @@ import android.hardware.input.KeyboardLayout;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.FileObserver;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -241,6 +242,19 @@ public class InputManagerService extends IInputManager.Stub
     /** Whether to use the dev/input/event or uevent subsystem for the audio jack. */
     final boolean mUseDevInputEventForAudioJack;
 
+    private class TscalObserver extends FileObserver {
+        public TscalObserver() {
+            super("/data/misc/tscal/pointercal", CLOSE_WRITE);
+        }
+
+        @Override
+        public void onEvent(int event, String path) {
+            Slog.i(TAG, "detect pointercal changed");
+            reloadDeviceAliases();
+        }
+    }
+    private final TscalObserver mTscalObserver = new TscalObserver();
+
     public InputManagerService(Context context, Handler handler) {
         this.mContext = context;
         this.mHandler = new InputManagerHandler(handler.getLooper());
@@ -250,6 +264,7 @@ public class InputManagerService extends IInputManager.Stub
         Slog.i(TAG, "Initializing input manager, mUseDevInputEventForAudioJack="
                 + mUseDevInputEventForAudioJack);
         mPtr = nativeInit(this, mContext, mHandler.getLooper().getQueue());
+        mTscalObserver.startWatching();
     }
 
     public void setWindowManagerCallbacks(WindowManagerCallbacks callbacks) {
